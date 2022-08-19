@@ -25,7 +25,7 @@ Soon...
 
 ## Packages
 
-[(Back to top)](#table-of-contents)- 
+[(Back to top)](#table-of-contents)-
 
 Soon...
 
