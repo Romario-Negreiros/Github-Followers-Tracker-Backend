@@ -1,0 +1,30 @@
+{
+  "name": "github-followers-tracker",
+  "version": "1.0.0",
+  "description": "A github bot that keeps track of your followers, sending emails when someone follows you, or unfollows.",
+  "keywords": [
+    "bot",
+    "github"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/server.ts",
+    "start": "node dist/server.js",
+    "build": "sucrase ./src -d ./dist --transforms typescript,imports",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Romario Negreiros",
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.33.1",
+    "@typescript-eslint/parser": "^5.33.1",
+    "eslint": "^8.22.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.4",
+    "eslint-plugin-promise": "^6.0.0",
+    "nodemon": "^2.0.19",
+    "sucrase": "^3.25.0",
+    "typescript": "^4.7.4"
+  }
+}
