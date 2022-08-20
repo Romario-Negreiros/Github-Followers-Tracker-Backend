@@ -1,7 +1,3 @@
-import http from 'http'
+import app from './App'
 
-const server = http.createServer()
-
-server.listen(3300)
-
-server.on('listening', () => console.log('running'))
+app.listen(process.env.PORT || 3300, () => console.log('listening'))
