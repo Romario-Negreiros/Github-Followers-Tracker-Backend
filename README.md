@@ -21,13 +21,18 @@ if any action regarding to it is taken!
 
 [(Back to top)](#table-of-contents)
 
-Soon...
+- [x] Connect to mongoDB
+- [ ] Create usersController
+- [ ] Add user managing routes
+- [ ] Create github profile tracker bot functionality
 
 ## Packages
 
 [(Back to top)](#table-of-contents)-
 
-Soon...
+- [Express](https://expressjs.com)
+- [Mongoose](https://mongoosejs.com)
+- [Dotenv](https://www.npmjs.com/package/dotenv)
 
 ## Contributing
 
