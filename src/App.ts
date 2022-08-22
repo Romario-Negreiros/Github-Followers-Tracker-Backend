@@ -15,20 +15,19 @@ class App {
     this.setRoutes()
   }
 
-  private async setDatabaseConnection () {
+  private setDatabaseConnection = async () => {
     try {
       await connect()
-      console.log('conectado')
     } catch (err) {
       console.log(err.message)
     }
   }
 
-  private setMiddlewares () {
+  private setMiddlewares = () => {
     this.express.use(express.json())
   }
 
-  private setRoutes () {
+  private setRoutes = () => {
     this.express.use('/', routes)
   }
 }

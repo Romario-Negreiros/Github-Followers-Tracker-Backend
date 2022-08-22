@@ -3,7 +3,7 @@ import TrackedUser from '../models/trackedUser'
 import type { Request, Response } from 'express'
 
 class UsersController {
-  async register (req: Request, res: Response) {
+  register = async (req: Request, res: Response) => {
     const { name, email } = req.body
     if (!name || !email) {
       return res.status(400).json({ error: 'Missing either name or email field!' })
@@ -22,7 +22,7 @@ class UsersController {
     }
   }
 
-  async unregister (req: Request, res: Response) {
+  unregister = async (req: Request, res: Response) => {
     const { email } = req.body
     if (!email) {
       return res.status(400).json({ error: 'Missing email field!' })
