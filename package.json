@@ -11,8 +11,9 @@
     "dev": "nodemon src/server.ts",
     "start": "node dist/server.js",
     "build": "sucrase ./src -d ./dist --transforms typescript,imports",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prettier": "npx prettier --write ."
+    "prettier": "npx prettier --write .",
+    "lint": "npx eslint --fix . --ext .ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Romario Negreiros",
   "license": "ISC",
