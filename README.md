@@ -22,8 +22,8 @@ if any action regarding to it is taken!
 [(Back to top)](#table-of-contents)
 
 - [x] Connect to mongoDB
-- [ ] Create usersController
-- [ ] Add user managing routes
+- [x] Create usersController
+- [x] Add user managing routes
 - [ ] Create github profile tracker bot functionality
 
 ## Packages
