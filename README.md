@@ -24,7 +24,11 @@ if any action regarding to it is taken!
 - [x] Connect to mongoDB
 - [x] Create usersController
 - [x] Add user managing routes
-- [ ] Create github profile tracker bot functionality
+- [ ] Create bot
+  - [ ] Check github profile
+  - [ ] Create a relatory with the changes
+  - [ ] Send it to the user's email
+- [ ] Schedule a interval to run the bot for each user
 
 ## Packages
 
@@ -33,6 +37,7 @@ if any action regarding to it is taken!
 - [Express](https://expressjs.com)
 - [Mongoose](https://mongoosejs.com)
 - [Dotenv](https://www.npmjs.com/package/dotenv)
+- [Toad-scheduler](https://github.com/kibertoad/toad-scheduler)
 
 ## Contributing
 
