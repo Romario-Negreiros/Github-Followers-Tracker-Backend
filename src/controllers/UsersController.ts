@@ -15,7 +15,7 @@ class UsersController {
       return res.status(409).json({ error: 'User is already registered!' })
     }
 
-    const createdAt = new Date(Date.now()).toLocaleString()
+    const createdAt = Date.now()
     const trackedUser = new TrackedUser({ name, email, createdAt })
     try {
       await trackedUser.save()
@@ -53,7 +53,7 @@ class UsersController {
         .json({ error: 'Missing either name or email field!' })
     }
 
-    const updatedAt = new Date(Date.now()).toLocaleString()
+    const updatedAt = Date.now()
     const user = await TrackedUser.findOneAndUpdate(
       { email },
       { name, email: newEmail || email, updatedAt }
