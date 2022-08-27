@@ -36,6 +36,7 @@ export interface User {
 export interface Follower {
   login: string;
   avatar_url: string | null;
+  isYouFollowing?: boolean;
 }
 
-export interface Following extends Follower {}
+export interface Following extends Omit<Follower, 'isYouFollowing'> {}
