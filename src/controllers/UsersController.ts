@@ -11,7 +11,7 @@ class UsersController {
         .json({ error: 'Missing either name or email field!' })
     }
 
-    if (await TrackedUser.findOne({ email }).exec()) {
+    if (await TrackedUser.findOne({ email })) {
       return res.status(409).json({ error: 'User is already registered!' })
     }
 
