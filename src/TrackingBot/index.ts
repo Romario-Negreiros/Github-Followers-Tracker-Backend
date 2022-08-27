@@ -3,12 +3,12 @@ import TrackedUser from '../models/trackedUser'
 
 import type { Follower, Following } from './types/GithubAPIResponses'
 
-class UserTrackingBot {
+class TrackingBot {
   private name: string
   private email: string
   private pathToQueryUser: string
 
-  constructor(name: string, email: string) {
+  constructor (name: string, email: string) {
     this.name = name
     this.email = email
     this.pathToQueryUser = `https://api.github.com/users/${this.name}`
@@ -18,18 +18,88 @@ class UserTrackingBot {
 
   getTrackedUser = () => this.name
 
+  private getFollowersListChanges = (
+    followersResponse: Follower[],
+    savedFollowers: Follower[]
+  ) => {
+    const follows: Follower[] = followersResponse.filter(follower => {
+      if (
+        !savedFollowers.some(
+          savedFollower => savedFollower.login === follower.login
+        )
+      ) {
+        return follower
+      }
+      return null
+    })
+
+    const unfollows: Follower[] = savedFollowers.filter(savedFollower => {
+      if (
+        !followersResponse.some(
+          follower => follower.login === savedFollower.login
+        )
+      ) {
+        return savedFollower
+      }
+      return null
+    })
+
+    return {
+      follows,
+      unfollows
+    }
+  }
+
+  private setIsYouFollowing = async (
+    follows: Follower[],
+    unfollows: Follower[]
+  ) => {
+    const followingResponse = await axios.get<Following[]>(
+      `${this.pathToQueryUser}/following`
+    )
+
+    follows.forEach(follower => {
+      if (
+        !followingResponse.data.some(
+          following => following.login === follower.login
+        )
+      ) {
+        follower.isYouFollowing = false
+      } else {
+        follower.isYouFollowing = true
+      }
+    })
+
+    unfollows.forEach(unfollower => {
+      if (
+        !followingResponse.data.some(
+          following => following.login === unfollower.login
+        )
+      ) {
+        unfollower.isYouFollowing = false
+      } else {
+        unfollower.isYouFollowing = true
+      }
+    })
+  }
+
   private initTracking = async () => {
     try {
-      const { data: following } = await axios.get<Following[]>(
-        `${this.pathToQueryUser}/following`
-      )
       const { data: followers } = await axios.get<Follower[]>(
         `${this.pathToQueryUser}/followers`
       )
       const checkedAt = Date.now()
       await TrackedUser.findOneAndUpdate(
         { email: this.email },
-        { followers, following, checkedAt }
+        {
+          followers: followers.map(follower => {
+            return {
+              login: follower.login,
+              avatar_url: follower.avatar_url
+            }
+          }),
+          checkedAt
+        }
       )
     } catch (err) {
       // TO-DO handle errors properly
@@ -39,23 +109,20 @@ class UserTrackingBot {
 
   checkGithubProfile = async () => {
     try {
-      const followingResponse = await axios.get<Following[]>(
-        `${this.pathToQueryUser}/following`
-      )
       const followersResponse = await axios.get<Follower[]>(
         `${this.pathToQueryUser}/followers`
       )
       const user = await TrackedUser.findOne({ email: this.email })
       if (user) {
-        // TO-DO decide either to verify changes directly or indirectly
-        // directly > look for new follows/unfollows, and if there are any, keep going with the method
-        // indirectly > what im doing now, first check if the lists arent the same, if no, get the changes and keep going
-        const hasFollowingListChanged = followingResponse.data.every(
-          followingResponseUser =>
-            user.following.some(
-              followingUser => followingResponseUser === followingUser
-            )
+        const { follows, unfollows } = this.getFollowersListChanges(
+          followersResponse.data,
+          user.followers as Follower[]
         )
+        console.log(follows, unfollows)
+        if (follows.length || unfollows.length) {
+          await this.setIsYouFollowing(follows, unfollows)
+        }
+        console.log(follows, unfollows)
       }
     } catch (err) {
       // TO-DO handle errors properly
@@ -64,4 +131,4 @@ class UserTrackingBot {
   }
 }
 
-export default UserTrackingBot
+export default TrackingBot
