@@ -9,10 +9,6 @@ const trackedUserSchema = new Schema({
     login: String,
     avatar_url: { type: String, default: null }
   }],
-  following: [{
-    login: String,
-    avatar_url: { type: String, default: null }
-  }],
   checkedAt: { type: Date, default: null },
   createdAt: Date,
   updatedAt: { type: Date, default: null }
