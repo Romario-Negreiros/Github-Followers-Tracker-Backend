@@ -1,12 +1,17 @@
 import axios from 'axios'
 import TrackedUser from '../models/trackedUser'
 
-import type { Follower, Following } from './types/GithubAPIResponses'
+import type { Follower, Following, User } from './types/GithubAPIResponses'
 
 class TrackingBot {
   private name: string
   private email: string
   private pathToQueryUser: string
+  private axiosRequestConfig = {
+    headers: {
+      accept: 'application/vnd.github+json'
+    }
+  }
 
   constructor (name: string, email: string) {
     this.name = name
@@ -17,6 +22,72 @@ class TrackingBot {
   }
 
   getTrackedUser = () => this.name
+
+  checkGithubProfile = async () => {
+    try {
+      const user = await TrackedUser.findOne({ email: this.email })
+      const {
+        data: { following }
+      } = await axios.get<User>(this.pathToQueryUser, this.axiosRequestConfig)
+      if (user) {
+        const pages = Math.ceil(user.followers.length / 100)
+        const followersResponse: Follower[] = []
+        for (let page = 1; page <= pages; page++) {
+          const { data } = await axios.get<Follower[]>(
+            `${this.pathToQueryUser}/followers?per_page=100&page=${page}`,
+            this.axiosRequestConfig
+          )
+          followersResponse.push(...data)
+        }
+        const { follows, unfollows } = this.getFollowersListChanges(
+          followersResponse,
+          user.followers as Follower[]
+        )
+        if (follows.length || unfollows.length) {
+          const pages = Math.ceil(following / 100)
+          await this.setIsYouFollowing(follows, unfollows, pages)
+        }
+        console.log(follows, unfollows)
+      }
+    } catch (err) {
+      // TO-DO handle errors properly
+      console.error(err.message)
+    }
+  }
+
+  private initTracking = async () => {
+    try {
+      const { data: user } = await axios.get<User>(
+        this.pathToQueryUser,
+        this.axiosRequestConfig
+      )
+      const pages = Math.ceil(user.followers / 100)
+      const followers: Follower[] = []
+      for (let page = 1; page <= pages; page++) {
+        const { data } = await axios.get<Follower[]>(
+          `${this.pathToQueryUser}/followers?per_page=100&page=${page}`,
+          this.axiosRequestConfig
+        )
+        followers.push(...data)
+      }
+      const checkedAt = Date.now()
+      await TrackedUser.findOneAndUpdate(
+        { email: this.email },
+        {
+          followers: followers.map(follower => {
+            return {
+              login: follower.login,
+              avatar_url: follower.avatar_url
+            }
+          }),
+          checkedAt
+        }
+      )
+    } catch (err) {
+      // TO-DO handle errors properly
+      console.log(err.message)
+    }
+  }
 
   private getFollowersListChanges = (
     followersResponse: Follower[],
@@ -52,18 +123,20 @@ class TrackingBot {
 
   private setIsYouFollowing = async (
     follows: Follower[],
-    unfollows: Follower[]
+    unfollows: Follower[],
+    pages: number
   ) => {
-    const followingResponse = await axios.get<Following[]>(
-      `${this.pathToQueryUser}/following`
-    )
+    const followings: Following[] = []
+    for (let page = 0; page <= pages; page++) {
+      const followingResponse = await axios.get<Following[]>(
+        `${this.pathToQueryUser}/following?per_page=100&page=${page}`,
+        this.axiosRequestConfig
+      )
+      followings.push(...followingResponse.data)
+    }
 
     follows.forEach(follower => {
-      if (
-        !followingResponse.data.some(
-          following => following.login === follower.login
-        )
-      ) {
+      if (!followings.some(following => following.login === follower.login)) {
         follower.isYouFollowing = false
       } else {
         follower.isYouFollowing = true
@@ -71,63 +144,12 @@ class TrackingBot {
     })
 
     unfollows.forEach(unfollower => {
-      if (
-        !followingResponse.data.some(
-          following => following.login === unfollower.login
-        )
-      ) {
+      if (!followings.some(following => following.login === unfollower.login)) {
         unfollower.isYouFollowing = false
       } else {
         unfollower.isYouFollowing = true
       }
     })
-  }
-
-  private initTracking = async () => {
-    try {
-      const { data: followers } = await axios.get<Follower[]>(
-        `${this.pathToQueryUser}/followers`
-      )
-      const checkedAt = Date.now()
-      await TrackedUser.findOneAndUpdate(
-        { email: this.email },
-        {
-          followers: followers.map(follower => {
-            return {
-              login: follower.login,
-              avatar_url: follower.avatar_url
-            }
-          }),
-          checkedAt
-        }
-      )
-    } catch (err) {
-      // TO-DO handle errors properly
-      console.log(err.message)
-    }
-  }
-
-  checkGithubProfile = async () => {
-    try {
-      const followersResponse = await axios.get<Follower[]>(
-        `${this.pathToQueryUser}/followers`
-      )
-      const user = await TrackedUser.findOne({ email: this.email })
-      if (user) {
-        const { follows, unfollows } = this.getFollowersListChanges(
-          followersResponse.data,
-          user.followers as Follower[]
-        )
-        console.log(follows, unfollows)
-        if (follows.length || unfollows.length) {
-          await this.setIsYouFollowing(follows, unfollows)
-        }
-        console.log(follows, unfollows)
-      }
-    } catch (err) {
-      // TO-DO handle errors properly
-      console.error(err.message)
-    }
   }
 }
 
