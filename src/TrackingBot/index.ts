@@ -18,7 +18,7 @@ class TrackingBot {
     this.email = email
     this.pathToQueryUser = `https://api.github.com/users/${this.name}`
 
-    this.initTracking()
+    // this.initTracking()
   }
 
   getTrackedUser = () => this.name
@@ -37,17 +37,24 @@ class TrackingBot {
             `${this.pathToQueryUser}/followers?per_page=100&page=${page}`,
             this.axiosRequestConfig
           )
-          followersResponse.push(...data)
+          data.forEach(follower => {
+            followersResponse.push({
+              login: follower.login,
+              avatar_url: follower.avatar_url
+            })
+          })
         }
-        const { follows, unfollows } = this.getFollowersListChanges(
+        let { follows, unfollows } = this.getFollowersListChanges(
           followersResponse,
           user.followers as Follower[]
         )
-        if (follows.length || unfollows.length) {
-          const pages = Math.ceil(following / 100)
-          await this.setIsYouFollowing(follows, unfollows, pages)
+        if (!follows.length && !unfollows.length) {
+          // TO-DO send email saying that there are no changes
+          return
         }
-        console.log(follows, unfollows)
+        const response = await this.setIsYouFollowing(follows, unfollows, following)
+        follows = response.follows
+        unfollows = response.unfollows
       }
     } catch (err) {
       // TO-DO handle errors properly
@@ -68,7 +75,12 @@ class TrackingBot {
           `${this.pathToQueryUser}/followers?per_page=100&page=${page}`,
           this.axiosRequestConfig
         )
-        followers.push(...data)
+        data.forEach(follower => {
+          followers.push({
+            login: follower.login,
+            avatar_url: follower.avatar_url
+          })
+        })
       }
       const checkedAt = Date.now()
       await TrackedUser.findOneAndUpdate(
@@ -85,7 +97,7 @@ class TrackingBot {
       )
     } catch (err) {
       // TO-DO handle errors properly
-      console.log(err.message)
+      console.error(err.message)
     }
   }
 
@@ -124,32 +136,44 @@ class TrackingBot {
   private setIsYouFollowing = async (
     follows: Follower[],
     unfollows: Follower[],
-    pages: number
+    following: number
   ) => {
+    const pages = Math.ceil(following / 100)
     const followings: Following[] = []
     for (let page = 0; page <= pages; page++) {
-      const followingResponse = await axios.get<Following[]>(
+      const { data } = await axios.get<Following[]>(
         `${this.pathToQueryUser}/following?per_page=100&page=${page}`,
         this.axiosRequestConfig
       )
-      followings.push(...followingResponse.data)
+      data.forEach(following => {
+        followings.push({
+          login: following.login,
+          avatar_url: following.avatar_url
+        })
+      })
+    }
+    const response = {
+      follows: follows.map(follower => {
+        if (!followings.some(following => following.login === follower.login)) {
+          return { ...follower, isYouFollowing: false }
+        } else {
+          return { ...follower, isYouFollowing: true }
+        }
+      }),
+      unfollows: unfollows.map(unfollower => {
+        if (
+          followings.some(following => following.login === unfollower.login)
+        ) {
+          return {
+            ...unfollower,
+            isYouFollowing: true
+          }
+        }
+        return unfollower
+      })
     }
 
-    follows.forEach(follower => {
-      if (!followings.some(following => following.login === follower.login)) {
-        follower.isYouFollowing = false
-      } else {
-        follower.isYouFollowing = true
-      }
-    })
-
-    unfollows.forEach(unfollower => {
-      if (!followings.some(following => following.login === unfollower.login)) {
-        unfollower.isYouFollowing = false
-      } else {
-        unfollower.isYouFollowing = true
-      }
-    })
+    return response
   }
 }
 
