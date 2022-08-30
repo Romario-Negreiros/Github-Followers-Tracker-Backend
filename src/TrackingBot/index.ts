@@ -44,10 +44,7 @@ class TrackingBot {
             })
           })
         }
-        let { follows, unfollows } = this.getFollowersListChanges(
-          followersResponse,
-          user.followers as Follower[]
-        )
+        let { follows, unfollows } = this.getFollowersListChanges(followersResponse, user.followers as Follower[])
         if (!follows.length && !unfollows.length) {
           // TO-DO send email saying that there are no changes
           return
@@ -64,10 +61,7 @@ class TrackingBot {
 
   private initTracking = async () => {
     try {
-      const { data: user } = await axios.get<User>(
-        this.pathToQueryUser,
-        this.axiosRequestConfig
-      )
+      const { data: user } = await axios.get<User>(this.pathToQueryUser, this.axiosRequestConfig)
       const pages = Math.ceil(user.followers / 100)
       const followers: Follower[] = []
       for (let page = 1; page <= pages; page++) {
@@ -101,27 +95,16 @@ class TrackingBot {
     }
   }
 
-  private getFollowersListChanges = (
-    followersResponse: Follower[],
-    savedFollowers: Follower[]
-  ) => {
+  private getFollowersListChanges = (followersResponse: Follower[], savedFollowers: Follower[]) => {
     const follows: Follower[] = followersResponse.filter(follower => {
-      if (
-        !savedFollowers.some(
-          savedFollower => savedFollower.login === follower.login
-        )
-      ) {
+      if (!savedFollowers.some(savedFollower => savedFollower.login === follower.login)) {
         return follower
       }
       return null
     })
 
     const unfollows: Follower[] = savedFollowers.filter(savedFollower => {
-      if (
-        !followersResponse.some(
-          follower => follower.login === savedFollower.login
-        )
-      ) {
+      if (!followersResponse.some(follower => follower.login === savedFollower.login)) {
         return savedFollower
       }
       return null
@@ -133,11 +116,7 @@ class TrackingBot {
     }
   }
 
-  private setIsYouFollowing = async (
-    follows: Follower[],
-    unfollows: Follower[],
-    following: number
-  ) => {
+  private setIsYouFollowing = async (follows: Follower[], unfollows: Follower[], following: number) => {
     const pages = Math.ceil(following / 100)
     const followings: Following[] = []
     for (let page = 0; page <= pages; page++) {
@@ -161,9 +140,7 @@ class TrackingBot {
         }
       }),
       unfollows: unfollows.map(unfollower => {
-        if (
-          followings.some(following => following.login === unfollower.login)
-        ) {
+        if (followings.some(following => following.login === unfollower.login)) {
           return {
             ...unfollower,
             isYouFollowing: true
