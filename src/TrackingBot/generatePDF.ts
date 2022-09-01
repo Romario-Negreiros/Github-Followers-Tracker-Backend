@@ -1,8 +1,9 @@
 import PDFDocument from 'pdfkit'
 import fs from 'fs'
-import { Follower } from './types/GithubAPIResponses'
 
-const generatePDF = (userName: string, follows: Follower[], unfollows: Follower[]) => {
+import type { Follower } from './types/GithubAPIResponses'
+
+const generatePDF = async (userName: string, follows: Follower[], unfollows: Follower[]) => {
   const doc = new PDFDocument({ size: 'A4' })
   doc.font('Helvetica')
 
