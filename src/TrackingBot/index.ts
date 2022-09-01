@@ -2,6 +2,7 @@ import axios from 'axios'
 import TrackedUser from '../models/trackedUser'
 
 import type { Follower, Following, User } from './types/GithubAPIResponses'
+import generatePDF from './generatePDF'
 
 class TrackingBot {
   private name: string
@@ -40,18 +41,15 @@ class TrackingBot {
           data.forEach(follower => {
             followersResponse.push({
               login: follower.login,
-              avatar_url: follower.avatar_url
+              html_url: follower.html_url
             })
           })
         }
         let { follows, unfollows } = this.getFollowersListChanges(followersResponse, user.followers as Follower[])
-        if (!follows.length && !unfollows.length) {
-          // TO-DO send email saying that there are no changes
-          return
-        }
         const response = await this.setIsYouFollowing(follows, unfollows, following)
         follows = response.follows
         unfollows = response.unfollows
+        generatePDF(user.name as string, follows, unfollows)
       }
     } catch (err) {
       // TO-DO handle errors properly
@@ -72,7 +70,7 @@ class TrackingBot {
         data.forEach(follower => {
           followers.push({
             login: follower.login,
-            avatar_url: follower.avatar_url
+            html_url: follower.html_url
           })
         })
       }
@@ -83,7 +81,7 @@ class TrackingBot {
           followers: followers.map(follower => {
             return {
               login: follower.login,
-              avatar_url: follower.avatar_url
+              html_url: follower.html_url
             }
           }),
           checkedAt
@@ -127,7 +125,7 @@ class TrackingBot {
       data.forEach(following => {
         followings.push({
           login: following.login,
-          avatar_url: following.avatar_url
+          html_url: following.html_url
         })
       })
     }
