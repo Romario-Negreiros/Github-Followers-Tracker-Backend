@@ -25,8 +25,8 @@ if any action regarding to it is taken!
 - [x] Create usersController
 - [x] Add user managing routes
 - [ ] Create bot
-  - [ ] Check github profile
-  - [ ] Create a relatory with the changes
+  - [x] Check github profile and get follows and unfollows
+  - [x] Create pdf report with the changes
   - [ ] Send it to the user's email
 - [ ] Schedule a interval to run the bot for each user
 
@@ -38,6 +38,7 @@ if any action regarding to it is taken!
 - [Mongoose](https://mongoosejs.com)
 - [Dotenv](https://www.npmjs.com/package/dotenv)
 - [Toad-scheduler](https://github.com/kibertoad/toad-scheduler)
+- [Pdfkit](https://pdfkit.org)
 
 ## Contributing
 
