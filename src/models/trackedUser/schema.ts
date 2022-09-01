@@ -8,7 +8,7 @@ const trackedUserSchema = new Schema({
   followers: [
     {
       login: String,
-      avatar_url: { type: String, default: null }
+      html_url: String
     }
   ],
   checkedAt: { type: Date, default: null },
