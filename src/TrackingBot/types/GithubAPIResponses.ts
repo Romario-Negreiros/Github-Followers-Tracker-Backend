@@ -35,7 +35,7 @@ export interface User {
 
 export interface Follower {
   login: string
-  avatar_url: string | null
+  html_url: string
   isYouFollowing?: boolean
 }
 
