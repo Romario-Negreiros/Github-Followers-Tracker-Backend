@@ -3,6 +3,7 @@ import TrackedUser from '../models/trackedUser'
 
 import type { Follower, Following, User } from './types/GithubAPIResponses'
 import generatePDF from './generatePDF'
+import sendEmail from './sendEmail'
 
 class TrackingBot {
   private name: string
@@ -49,7 +50,13 @@ class TrackingBot {
         const response = await this.setIsYouFollowing(follows, unfollows, following)
         follows = response.follows
         unfollows = response.unfollows
-        generatePDF(user.name as string, follows, unfollows)
+        await generatePDF(this.name, follows, unfollows)
+        await sendEmail({ name: this.name, email: this.email })
+
+        const checkedAt = Date.now()
+        user.checkedAt = checkedAt
+        user.followers = followersResponse
+        user.save()
       }
     } catch (err) {
       // TO-DO handle errors properly
