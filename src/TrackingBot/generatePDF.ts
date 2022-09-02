@@ -4,7 +4,7 @@ import fs from 'fs'
 import type { Follower } from './types/GithubAPIResponses'
 
 const generatePDF = async (userName: string, follows: Follower[], unfollows: Follower[]) => {
-  await new Promise(() => {
+  await new Promise<void>(resolve => {
     const doc = new PDFDocument({ size: 'A4' })
     doc.font('Helvetica')
 
@@ -68,8 +68,12 @@ const generatePDF = async (userName: string, follows: Follower[], unfollows: Fol
       doc.fontSize(14).text('No unfollows today!')
     }
 
-    doc.pipe(fs.createWriteStream(`${userName}-report.pdf`))
+    const writeStream = doc.pipe(fs.createWriteStream(`${userName}-report.pdf`))
     doc.end()
+
+    writeStream.on('ready', () => {
+      resolve()
+    })
   })
 }
 
