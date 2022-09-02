@@ -11,9 +11,9 @@ const trackedUserSchema = new Schema({
       html_url: String
     }
   ],
-  checkedAt: { type: Date, default: null },
-  createdAt: Date,
-  updatedAt: { type: Date, default: null }
+  checkedAt: { type: Number, default: null },
+  createdAt: Number,
+  updatedAt: { type: Number, default: null }
 })
 
 export default trackedUserSchema
