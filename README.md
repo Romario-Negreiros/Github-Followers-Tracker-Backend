@@ -32,13 +32,19 @@ if any action regarding to it is taken!
 
 ## Packages
 
-[(Back to top)](#table-of-contents)-
+[(Back to top)](#table-of-contents)
 
 - [Express](https://expressjs.com)
 - [Mongoose](https://mongoosejs.com)
 - [Dotenv](https://www.npmjs.com/package/dotenv)
 - [Toad-scheduler](https://github.com/kibertoad/toad-scheduler)
 - [Pdfkit](https://pdfkit.org)
+
+# Useful links
+
+[(Back to top)](#table-of-contents)
+
+- [Event emitter](https://nodejs.org/api/events.html#events)
 
 ## Contributing
 
