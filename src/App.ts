@@ -7,7 +7,7 @@ import type { Express } from 'express'
 class App {
   express: Express
 
-  constructor() {
+  constructor () {
     this.express = express()
 
     this.setDatabaseConnection()

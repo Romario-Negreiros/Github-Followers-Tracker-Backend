@@ -1,7 +1,7 @@
 import PDFDocument from 'pdfkit'
 import fs from 'fs'
 
-import type { Follower } from './types/GithubAPIResponses'
+import type { Follower } from '../types/GithubAPIResponses'
 
 const generatePDF = async (userName: string, follows: Follower[], unfollows: Follower[]) => {
   await new Promise<void>(resolve => {

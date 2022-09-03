@@ -1,9 +1,8 @@
 import axios from 'axios'
-import TrackedUser from '../models/trackedUser'
+import TrackedUser from '../../models/trackedUser'
+import { generatePDF, sendEmail } from '../utils'
 
-import type { Follower, Following, User } from './types/GithubAPIResponses'
-import generatePDF from './generatePDF'
-import sendEmail from './sendEmail'
+import type { Follower, Following, User } from '../types/GithubAPIResponses'
 
 class TrackingBot {
   private name: string
@@ -20,7 +19,7 @@ class TrackingBot {
     this.email = email
     this.pathToQueryUser = `https://api.github.com/users/${this.name}`
 
-    // this.initTracking()
+    this.initTracking()
   }
 
   getTrackedUser = () => this.name
@@ -59,8 +58,7 @@ class TrackingBot {
         user.save()
       }
     } catch (err) {
-      // TO-DO handle errors properly
-      console.error(err.message)
+      console.log(err)
     }
   }
 
@@ -95,8 +93,7 @@ class TrackingBot {
         }
       )
     } catch (err) {
-      // TO-DO handle errors properly
-      console.error(err.message)
+      console.log(err.message)
     }
   }
 
