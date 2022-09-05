@@ -19,7 +19,7 @@ class UsersController {
     try {
       await trackedUser.save()
 
-      const bot = new TrackingBot(name, email)
+      const bot = new TrackingBot(name, email, true)
       scheduler.addSchedule(bot)
 
       return res

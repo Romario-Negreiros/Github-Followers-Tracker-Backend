@@ -15,12 +15,12 @@ class TrackingBot {
     }
   }
 
-  constructor (name: string, email: string) {
+  constructor (name: string, email: string, saveInitialData?: boolean) {
     this.name = name
     this.email = email
     this.pathToQueryUser = `https://api.github.com/users/${this.name}`
 
-    this.saveInitialData()
+    if (saveInitialData) this.saveInitialData()
   }
 
   getUserEmail = () => this.email
