@@ -7,6 +7,7 @@ import type { Follower, Following, User } from '../types/GithubAPIResponses'
 class TrackingBot {
   private name: string
   private email: string
+  userNotFound: boolean
   private pathToQueryUser: string
   private axiosRequestConfig = {
     headers: {
@@ -19,10 +20,12 @@ class TrackingBot {
     this.email = email
     this.pathToQueryUser = `https://api.github.com/users/${this.name}`
 
-    this.initTracking()
+    this.saveInitialData()
   }
 
-  getTrackedUser = () => this.name
+  getUserEmail = () => this.email
+
+  getUserName = () => this.name
 
   checkGithubProfile = async () => {
     try {
@@ -62,7 +65,7 @@ class TrackingBot {
     }
   }
 
-  private initTracking = async () => {
+  private saveInitialData = async () => {
     try {
       const { data: user } = await axios.get<User>(this.pathToQueryUser, this.axiosRequestConfig)
       const pages = Math.ceil(user.followers / 100)
@@ -79,7 +82,6 @@ class TrackingBot {
           })
         })
       }
-      const checkedAt = Date.now()
       await TrackedUser.findOneAndUpdate(
         { email: this.email },
         {
@@ -88,12 +90,15 @@ class TrackingBot {
               login: follower.login,
               html_url: follower.html_url
             }
-          }),
-          checkedAt
+          })
         }
       )
     } catch (err) {
-      console.log(err.message)
+      if (err.response.status === 404) {
+        this.userNotFound = true
+      } else {
+        console.log(err)
+      }
     }
   }
 
