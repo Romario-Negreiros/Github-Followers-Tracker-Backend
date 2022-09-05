@@ -72,12 +72,6 @@ if any action regarding to it is taken!
     >> After your pull request\'s merge has been done, you can delete your branch
 ```
 
-## Useful links
-
-[(Back to top)](#table-of-contents)
-
-Soon...
-
 ## Author
 
 [(Back to top)](#table-of-contents)
