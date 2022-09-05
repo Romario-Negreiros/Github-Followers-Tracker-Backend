@@ -1,4 +1,5 @@
 import TrackedUser from '../models/trackedUser'
+import { TrackingBot, scheduler } from '../service/classes'
 
 import type { Request, Response } from 'express'
 
@@ -17,11 +18,16 @@ class UsersController {
     const trackedUser = new TrackedUser({ name, email, createdAt })
     try {
       await trackedUser.save()
+
+      const bot = new TrackingBot(name, email)
+      scheduler.addSchedule(bot)
+
       return res
         .status(201)
         .send("User added to tracking list, you'll receive updates about your github profile every hour!")
     } catch (err) {
-      return res.status(500).json({ error: 'Failed to register new tracked user!' })
+      console.log(err)
+      return res.status(500).json({ error: 'Failed to register user!' })
     }
   }
 
@@ -31,12 +37,22 @@ class UsersController {
       return res.status(400).json({ error: 'Missing email field!' })
     }
 
-    const user = await TrackedUser.findOneAndDelete({ email })
-    if (!user) {
-      return res.status(404).json({ error: 'This user is not registered!' })
-    }
+    try {
+      const user = await TrackedUser.findOne({ email })
+      if (!user) {
+        return res.status(404).json({ error: 'This user is not registered!' })
+      }
 
-    return res.status(204).end()
+      scheduler.removeById(email)
+      scheduler.removeBot(email)
+
+      await user.delete()
+
+      return res.status(204).end()
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({ error: 'Unable to unregister user!' })
+    }
   }
 
   update = async (req: Request, res: Response) => {
@@ -46,12 +62,23 @@ class UsersController {
     }
 
     const updatedAt = Date.now()
-    const user = await TrackedUser.findOneAndUpdate({ email }, { name, email: newEmail || email, updatedAt })
-    if (!user) {
-      return res.status(404).json({ error: 'This user is not registered!' })
-    }
+    try {
+      const user = await TrackedUser.findOneAndUpdate({ email }, { name, email: newEmail || email, updatedAt })
+      if (!user) {
+        return res.status(404).json({ error: 'This user is not registered!' })
+      }
 
-    return res.status(204).end()
+      scheduler.removeById(email)
+      scheduler.removeBot(email)
+
+      const bot = new TrackingBot(name, newEmail || email)
+      scheduler.addSchedule(bot)
+
+      return res.status(204).end()
+    } catch (err) {
+      console.log(err)
+      return res.status(500).json({ error: "Unable to update user's profile!" })
+    }
   }
 }
 
