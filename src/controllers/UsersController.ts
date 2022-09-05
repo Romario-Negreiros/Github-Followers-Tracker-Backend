@@ -1,5 +1,6 @@
 import TrackedUser from '../models/trackedUser'
 import { TrackingBot, scheduler } from '../service/classes'
+import { logError } from '../service/utils'
 
 import type { Request, Response } from 'express'
 
@@ -26,7 +27,7 @@ class UsersController {
         .status(201)
         .send("User added to tracking list, you'll receive updates about your github profile every hour!")
     } catch (err) {
-      console.log(err)
+      logError(err)
       return res.status(500).json({ error: 'Failed to register user!' })
     }
   }
@@ -50,7 +51,7 @@ class UsersController {
 
       return res.status(204).end()
     } catch (err) {
-      console.log(err)
+      logError(err)
       return res.status(500).json({ error: 'Unable to unregister user!' })
     }
   }
@@ -76,7 +77,7 @@ class UsersController {
 
       return res.status(204).end()
     } catch (err) {
-      console.log(err)
+      logError(err)
       return res.status(500).json({ error: "Unable to update user's profile!" })
     }
   }

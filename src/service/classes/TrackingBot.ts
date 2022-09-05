@@ -1,6 +1,6 @@
 import axios from 'axios'
 import TrackedUser from '../../models/trackedUser'
-import { generatePDF, sendEmail } from '../utils'
+import { generatePDF, sendEmail, logError } from '../utils'
 
 import type { Follower, Following, User } from '../types/GithubAPIResponses'
 
@@ -61,7 +61,7 @@ class TrackingBot {
         user.save()
       }
     } catch (err) {
-      console.log(err)
+      logError(err)
     }
   }
 
@@ -97,7 +97,7 @@ class TrackingBot {
       if (err.response.status === 404) {
         this.userNotFound = true
       } else {
-        console.log(err)
+        logError(err)
       }
     }
   }
