@@ -29,7 +29,7 @@ if any action regarding to it is taken!
   - [x] Create pdf report with the changes
   - [x] Send it to the user's email
 - [x] Schedule a interval to run the bot for each user
-- [ ] Handle errors
+- [x] Handle errors
 
 ## Packages
 
