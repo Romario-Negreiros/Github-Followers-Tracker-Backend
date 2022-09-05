@@ -43,7 +43,7 @@ class UsersController {
         return res.status(404).json({ error: 'This user is not registered!' })
       }
 
-      scheduler.removeById(email)
+      scheduler.removeJob(email)
       scheduler.removeBot(email)
 
       await user.delete()
@@ -68,7 +68,7 @@ class UsersController {
         return res.status(404).json({ error: 'This user is not registered!' })
       }
 
-      scheduler.removeById(email)
+      scheduler.removeJob(email)
       scheduler.removeBot(email)
 
       const bot = new TrackingBot(name, newEmail || email)
