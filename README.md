@@ -24,11 +24,12 @@ if any action regarding to it is taken!
 - [x] Connect to mongoDB
 - [x] Create usersController
 - [x] Add user managing routes
-- [ ] Create bot
+- [x] Create bot
   - [x] Check github profile and get follows and unfollows
   - [x] Create pdf report with the changes
-  - [ ] Send it to the user's email
-- [ ] Schedule a interval to run the bot for each user
+  - [x] Send it to the user's email
+- [x] Schedule a interval to run the bot for each user
+- [ ] Handle errors
 
 ## Packages
 
