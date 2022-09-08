@@ -57,22 +57,34 @@ class UsersController {
   }
 
   update = async (req: Request, res: Response) => {
-    const { name, email, newEmail } = req.body
-    if (!name || !email) {
+    const { email, newName, newEmail } = req.body
+    if (!email) {
       return res.status(400).json({ error: 'Missing either name or email field!' })
     }
 
     const updatedAt = Date.now()
     try {
-      const user = await TrackedUser.findOneAndUpdate({ email }, { name, email: newEmail || email, updatedAt })
+      const user = await TrackedUser.findOne({ email })
       if (!user) {
         return res.status(404).json({ error: 'This user is not registered!' })
       }
 
+      if (newName) {
+        user.name = newName
+      }
+
+      if (newEmail) {
+        user.email = newEmail
+      }
+
+      user.updatedAt = updatedAt
+
+      await user.save()
+
       scheduler.removeJob(email)
       scheduler.removeBot(email)
 
-      const bot = new TrackingBot(name, newEmail || email)
+      const bot = new TrackingBot(newName || user.name as string, newEmail || email)
       scheduler.addSchedule(bot)
 
       return res.status(204).end()
