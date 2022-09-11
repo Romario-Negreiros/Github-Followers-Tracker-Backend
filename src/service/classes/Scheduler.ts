@@ -32,7 +32,7 @@ class Scheduler extends ToadScheduler {
   }
 
   createJob = (task: AsyncTask, id: string) => {
-    return new SimpleIntervalJob({ seconds: 15 }, task, id)
+    return new SimpleIntervalJob({ days: 1 }, task, id)
   }
 
   removeJob = (id: string) => this.removeById(id)
