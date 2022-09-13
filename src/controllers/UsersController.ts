@@ -20,7 +20,8 @@ class UsersController {
     try {
       await trackedUser.save()
 
-      const bot = new TrackingBot(name, email, true)
+      const bot = new TrackingBot(name, email)
+      await bot.saveInitialData()
       scheduler.addSchedule(bot)
 
       return res
@@ -28,6 +29,9 @@ class UsersController {
         .json({ message: "Profile added to tracking list, you'll receive updates about your github profile every hour!" })
     } catch (err) {
       logError(err)
+      if (err.response.status === 404) {
+        return res.status(404).json({ error: 'This user does not have a github acount!' })
+      }
       return res.status(500).json({ error: 'Failed to register user!' })
     }
   }
