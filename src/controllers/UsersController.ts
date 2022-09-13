@@ -15,20 +15,21 @@ class UsersController {
       return res.status(409).json({ error: 'User is already registered!' })
     }
 
-    const createdAt = Date.now()
-    const trackedUser = new TrackedUser({ name, email, createdAt })
     try {
-      await trackedUser.save()
-
       const bot = new TrackingBot(name, email)
       await bot.saveInitialData()
       scheduler.addSchedule(bot)
 
+      const createdAt = Date.now()
+      const trackedUser = new TrackedUser({ name, email, createdAt })
+
+      await trackedUser.save()
       return res
         .status(201)
         .json({ message: "Profile added to tracking list, you'll receive updates about your github profile every hour!" })
     } catch (err) {
       logError(err)
+
       if (err.response.status === 404) {
         return res.status(404).json({ error: 'This user does not have a github acount!' })
       }
@@ -72,6 +73,12 @@ class UsersController {
       if (!user) {
         return res.status(404).json({ error: 'This user is not registered!' })
       }
+      scheduler.removeJob(email)
+      scheduler.removeBot(email)
+
+      const bot = new TrackingBot(newName || (user.name as string), newEmail || email)
+      await bot.saveInitialData()
+      scheduler.addSchedule(bot)
 
       if (newName) {
         user.name = newName
@@ -84,12 +91,6 @@ class UsersController {
       user.updatedAt = updatedAt
 
       await user.save()
-
-      scheduler.removeJob(email)
-      scheduler.removeBot(email)
-
-      const bot = new TrackingBot(newName || (user.name as string), newEmail || email)
-      scheduler.addSchedule(bot)
 
       return res.status(204).json({ message: 'Your profile was succesfully updated!' })
     } catch (err) {
