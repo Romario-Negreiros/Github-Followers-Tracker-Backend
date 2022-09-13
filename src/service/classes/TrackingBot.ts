@@ -15,12 +15,10 @@ class TrackingBot {
     }
   }
 
-  constructor (name: string, email: string, saveInitialData?: boolean) {
+  constructor (name: string, email: string) {
     this.name = name
     this.email = email
     this.pathToQueryUser = `https://api.github.com/users/${this.name}`
-
-    if (saveInitialData) this.saveInitialData()
   }
 
   getUserEmail = () => this.email
@@ -65,41 +63,33 @@ class TrackingBot {
     }
   }
 
-  private saveInitialData = async () => {
-    try {
-      const { data: user } = await axios.get<User>(this.pathToQueryUser, this.axiosRequestConfig)
-      const pages = Math.ceil(user.followers / 100)
-      const followers: Follower[] = []
-      for (let page = 1; page <= pages; page++) {
-        const { data } = await axios.get<Follower[]>(
-          `${this.pathToQueryUser}/followers?per_page=100&page=${page}`,
-          this.axiosRequestConfig
-        )
-        data.forEach(follower => {
-          followers.push({
+  saveInitialData = async () => {
+    const { data: user } = await axios.get<User>(this.pathToQueryUser, this.axiosRequestConfig)
+    const pages = Math.ceil(user.followers / 100)
+    const followers: Follower[] = []
+    for (let page = 1; page <= pages; page++) {
+      const { data } = await axios.get<Follower[]>(
+        `${this.pathToQueryUser}/followers?per_page=100&page=${page}`,
+        this.axiosRequestConfig
+      )
+      data.forEach(follower => {
+        followers.push({
+          login: follower.login,
+          html_url: follower.html_url
+        })
+      })
+    }
+    await TrackedUser.findOneAndUpdate(
+      { email: this.email },
+      {
+        followers: followers.map(follower => {
+          return {
             login: follower.login,
             html_url: follower.html_url
-          })
+          }
         })
       }
-      await TrackedUser.findOneAndUpdate(
-        { email: this.email },
-        {
-          followers: followers.map(follower => {
-            return {
-              login: follower.login,
-              html_url: follower.html_url
-            }
-          })
-        }
-      )
-    } catch (err) {
-      if (err.response.status === 404) {
-        this.userNotFound = true
-      } else {
-        logError(err)
-      }
-    }
+    )
   }
 
   private getFollowersListChanges = (followersResponse: Follower[], savedFollowers: Follower[]) => {
