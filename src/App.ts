@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import connect from './database'
 import routes from './routes'
 
@@ -25,6 +26,7 @@ class App {
 
   private setMiddlewares = () => {
     this.express.use(express.json())
+    this.express.use(cors())
   }
 
   private setRoutes = () => {
