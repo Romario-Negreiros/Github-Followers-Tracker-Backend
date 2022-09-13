@@ -25,7 +25,7 @@ class UsersController {
 
       return res
         .status(201)
-        .send("Profile added to tracking list, you'll receive updates about your github profile every hour!")
+        .json({ message: "Profile added to tracking list, you'll receive updates about your github profile every hour!" })
     } catch (err) {
       logError(err)
       return res.status(500).json({ error: 'Failed to register user!' })
@@ -49,7 +49,7 @@ class UsersController {
 
       await user.delete()
 
-      return res.status(204).send('Your profile was removed from our tracking list!')
+      return res.status(204).json({ message: 'Your profile was removed from our tracking list!' })
     } catch (err) {
       logError(err)
       return res.status(500).json({ error: 'Unable to unregister user!' })
@@ -87,7 +87,7 @@ class UsersController {
       const bot = new TrackingBot(newName || (user.name as string), newEmail || email)
       scheduler.addSchedule(bot)
 
-      return res.status(204).send('Your profile was succesfully updated!')
+      return res.status(204).json({ message: 'Your profile was succesfully updated!' })
     } catch (err) {
       logError(err)
       return res.status(500).json({ error: "Unable to update user's profile!" })
