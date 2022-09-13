@@ -17,7 +17,7 @@ class Scheduler extends ToadScheduler {
     }
   }
 
-  addSchedule = async (bot: TrackingBot) => {
+  addSchedule = (bot: TrackingBot) => {
     const asyncTask = this.createAsyncTask(bot)
     const job = this.createJob(asyncTask, bot.getUserEmail())
     this.addSimpleIntervalJob(job)
