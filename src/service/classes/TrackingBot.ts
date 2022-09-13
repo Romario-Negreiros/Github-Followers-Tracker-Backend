@@ -3,6 +3,7 @@ import TrackedUser from '../../models/trackedUser'
 import { generatePDF, sendEmail, logError } from '../utils'
 
 import type { Follower, Following, User } from '../types/GithubAPIResponses'
+import { scheduler } from '.'
 
 class TrackingBot {
   private name: string
@@ -15,7 +16,7 @@ class TrackingBot {
     }
   }
 
-  constructor (name: string, email: string) {
+  constructor(name: string, email: string) {
     this.name = name
     this.email = email
     this.pathToQueryUser = `https://api.github.com/users/${this.name}`
@@ -59,6 +60,11 @@ class TrackingBot {
         user.save()
       }
     } catch (err) {
+      if (err.response.status === 404) {
+        await TrackedUser.deleteOne({ email: this.email })
+        scheduler.removeJob(this.email)
+        scheduler.removeBot(this.email)
+      }
       logError(err)
     }
   }
