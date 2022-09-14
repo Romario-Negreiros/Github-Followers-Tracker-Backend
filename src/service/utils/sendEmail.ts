@@ -6,7 +6,7 @@ interface User {
   email: string
 }
 
-sgMail.setApiKey(process.env['SENDGRID-API-KEY'] as string)
+sgMail.setApiKey(process.env.SENDGRID_API_KEY as string)
 
 const sendEmail = async (user: User) => {
   fs.readFile(`${user.name}-report.pdf`, async (err, data) => {
