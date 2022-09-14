@@ -28,7 +28,7 @@ class App {
     this.express.use(express.json())
     this.express.use(cors())
     this.express.use((req, res, next) => {
-      res.header({ 'Access-Control-Allow-Origin': '*' })
+      res.header('Access-Control-Allow-Origin', '*')
       next()
     })
   }
