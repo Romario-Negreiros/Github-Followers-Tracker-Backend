@@ -54,7 +54,7 @@ class UsersController {
 
       await user.delete()
 
-      return res.status(204).json({ message: 'Your profile was removed from our tracking list!' })
+      return res.status(204).json({ message: 'Your profile was removed from our tracking list!' }).append('Access-Control-Allow-Origin', '*')
     } catch (err) {
       logError(err)
       return res.status(500).json({ error: 'Unable to unregister user!' })

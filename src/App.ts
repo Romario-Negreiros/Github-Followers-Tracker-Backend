@@ -11,12 +11,12 @@ class App {
   constructor () {
     this.express = express()
 
+    this.setDatabaseConnection()
     this.setMiddlewares()
     this.setRoutes()
-    this.setDatabaseConnection()
   }
 
-  private async setDatabaseConnection () {
+  private setDatabaseConnection = async () => {
     try {
       await connect()
     } catch (err) {
@@ -24,13 +24,13 @@ class App {
     }
   }
 
-  private setMiddlewares () {
+  private setMiddlewares = () => {
     this.express.use(express.json())
     this.express.use(cors())
   }
 
-  private setRoutes () {
-    this.express.use(routes)
+  private setRoutes = () => {
+    this.express.use('/', routes)
   }
 }
 
