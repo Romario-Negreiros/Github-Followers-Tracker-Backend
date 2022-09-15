@@ -11,9 +11,9 @@ class App {
   constructor () {
     this.express = express()
 
-    this.setDatabaseConnection()
     this.setMiddlewares()
     this.setRoutes()
+    this.setDatabaseConnection()
   }
 
   private setDatabaseConnection = async () => {
@@ -30,9 +30,7 @@ class App {
   }
 
   private setRoutes = () => {
-    this.express.use('/users', ((req, res, next) => {
-      res.append('Access-Control-Allow-Origin', ['*', 'http://localhost:3000'])
-    }), routes)
+    this.express.use(routes)
   }
 }
 
