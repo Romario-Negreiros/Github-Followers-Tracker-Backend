@@ -16,7 +16,7 @@ class App {
     this.setDatabaseConnection()
   }
 
-  private setDatabaseConnection = async () => {
+  private async setDatabaseConnection () {
     try {
       await connect()
     } catch (err) {
@@ -24,12 +24,12 @@ class App {
     }
   }
 
-  private setMiddlewares = () => {
+  private setMiddlewares () {
     this.express.use(express.json())
     this.express.use(cors())
   }
 
-  private setRoutes = () => {
+  private setRoutes () {
     this.express.use(routes)
   }
 }
