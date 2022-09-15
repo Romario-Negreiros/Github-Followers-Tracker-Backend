@@ -27,14 +27,12 @@ class App {
   private setMiddlewares = () => {
     this.express.use(express.json())
     this.express.use(cors())
-    this.express.use((_, res, next) => {
-      res.append('Access-Control-Allow-Origin', '*')
-      next()
-    })
   }
 
   private setRoutes = () => {
-    this.express.use('/', routes)
+    this.express.use('/users', ((req, res, next) => {
+      res.append('Access-Control-Allow-Origin', ['*', 'http://localhost:3000'])
+    }), routes)
   }
 }
 
