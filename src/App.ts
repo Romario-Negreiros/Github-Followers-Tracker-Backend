@@ -27,8 +27,8 @@ class App {
   private setMiddlewares = () => {
     this.express.use(express.json())
     this.express.use(cors())
-    this.express.use((req, res, next) => {
-      res.header('Access-Control-Allow-Origin', '*')
+    this.express.use((_, res, next) => {
+      res.append('Access-Control-Allow-Origin', '*')
       next()
     })
   }
